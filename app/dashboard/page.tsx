@@ -3,23 +3,36 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabaseClient'
+import type { User } from '@supabase/supabase-js'
+
+interface Detection {
+  id: string
+  type: string
+  content: string
+  result: string
+  confidence: number
+  created_at: string
+}
 
 export default function DashboardPage() {
-  const [user, setUser] = useState<any>(null)
-  const [detections, setDetections] = useState<any[]>([])
+  const [user, setUser] = useState<User | null>(null)
+  const [detections, setDetections] = useState<Detection[]>([])
   const [message, setMessage] = useState("")
   const router = useRouter()
 
   useEffect(() => {
     const getUser = async () => {
       const { data, error } = await supabase.auth.getUser()
-      if (error || !data.user) return router.push('/login')
+      if (error || !data.user) {
+        router.push('/login')
+        return
+      }
       setUser(data.user)
       fetchDetections(data.user.id)
     }
 
     getUser()
-  }, [])
+  }, [router])
 
   const fetchDetections = async (userId: string) => {
     const { data, error } = await supabase
@@ -28,14 +41,20 @@ export default function DashboardPage() {
       .eq('user_id', userId)
       .order('created_at', { ascending: false })
 
-    if (!error) setDetections(data || [])
+    if (!error && data) {
+      setDetections(data as Detection[])
+    }
   }
 
   const sendMessage = async () => {
-    if (!message.trim()) return
-    await supabase.from('messages').insert({ user_id: user.id, message })
-    alert("Message sent!")
-    setMessage("")
+    if (!message.trim() || !user) return
+    const { error } = await supabase.from('messages').insert({ user_id: user.id, message })
+    if (!error) {
+      alert("Message sent!")
+      setMessage("")
+    } else {
+      alert("Failed to send message.")
+    }
   }
 
   return (
@@ -51,7 +70,10 @@ export default function DashboardPage() {
           rows={3}
           placeholder="Your message here..."
         />
-        <button onClick={sendMessage} className="mt-2 bg-cyan-500 hover:bg-cyan-600 px-4 py-2 rounded">
+        <button
+          onClick={sendMessage}
+          className="mt-2 bg-cyan-500 hover:bg-cyan-600 px-4 py-2 rounded"
+        >
           Send
         </button>
       </section>
@@ -63,7 +85,7 @@ export default function DashboardPage() {
           {detections.map((d) => (
             <div key={d.id} className="border border-cyan-400 p-4 rounded">
               <p><strong>Type:</strong> {d.type}</p>
-              <p><strong>Content:</strong> {d.content.slice(0, 60)}...</p>
+              <p><strong>Content:</strong> {d.content?.slice(0, 60)}...</p>
               <p><strong>Result:</strong> {d.result}</p>
               <p><strong>Confidence:</strong> {d.confidence.toFixed(2)}%</p>
               <p className="text-xs text-gray-400">{new Date(d.created_at).toLocaleString()}</p>

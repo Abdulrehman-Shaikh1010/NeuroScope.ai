@@ -1,8 +1,6 @@
 "use client"
 
 import { useState, useEffect, useCallback, FormEvent, ChangeEvent } from "react"
-import { useRouter } from "next/navigation"
-import Head from "next/head"
 import { supabase } from "@/lib/supabaseClient"
 
 interface LoginState {
@@ -21,8 +19,6 @@ export default function LoginPage() {
     loading: false,
     isFormValid: false,
   })
-
-  const router = useRouter()
 
   const validateForm = useCallback(() => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
@@ -58,10 +54,13 @@ export default function LoginPage() {
         return
       }
 
-    } catch (err: any) {
+      // Optional: redirect user after login
+      // router.push("/dashboard") or window.location.href = "/dashboard"
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : "Unknown error"
       setState((prev) => ({
         ...prev,
-        error: "An unexpected error occurred. Please try again.",
+        error: `An unexpected error occurred: ${errorMessage}`,
         loading: false,
       }))
     }
@@ -78,31 +77,7 @@ export default function LoginPage() {
 
   return (
     <>
-      {/* SEO Head Tags */}
-      <Head>
-        <title>Login to NeuroScope - AI Content Detection</title>
-        <meta
-          name="description"
-          content="Log in to NeuroScope to access advanced AI tools for detecting AI-generated or human-made content."
-        />
-        <meta
-          name="keywords"
-          content="NeuroScope login, AI detection, AI content tool, human-generated content, AI checker"
-        />
-        <meta name="robots" content="index, follow" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <link rel="canonical" href="https://www.neuroscope.com/login" />
-        <meta property="og:title" content="NeuroScope Login" />
-        <meta
-          property="og:description"
-          content="Securely log in to NeuroScope to analyze content with AI-powered detection tools."
-        />
-        <meta property="og:url" content="https://www.neuroscope.com/login" />
-        <meta property="og:type" content="website" />
-        <meta property="og:image" content="https://www.neuroscope.com/og-image.jpg" />
-      </Head>
-
-      {/* Schema.org JSON-LD */}
+      {/* JSON-LD Structured SEO Data */}
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
@@ -123,21 +98,10 @@ export default function LoginPage() {
                 height: 60,
               },
             },
-            mainEntity: {
-              "@type": "WebForm",
-              name: "Login Form",
-              action: "https://www.neuroscope.com/login",
-              potentialAction: {
-                "@type": "Action",
-                target: "https://www.neuroscope.com/dashboard",
-                name: "Login to Dashboard",
-              },
-            },
           }),
         }}
       />
 
-      {/* Login UI */}
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-black to-gray-900 text-white p-4">
         <form
           onSubmit={handleLogin}

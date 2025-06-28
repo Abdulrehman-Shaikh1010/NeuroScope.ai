@@ -37,8 +37,8 @@ export default function MediaDetectPage() {
   }
 
   const handleFileDrop = useCallback((files: File[]) => {
-    if (files.length === 0) return
     const file = files[0]
+    if (!file) return
 
     if (!file.type.startsWith("audio/") && !file.type.startsWith("video/")) {
       setState((prev) => ({
@@ -79,7 +79,7 @@ export default function MediaDetectPage() {
     setState((prev) => ({ ...prev, isDragging }))
   }, [])
 
-  const handleSubmit = async (e?: React.FormEvent) => {
+  const handleSubmit = useCallback(async (e?: React.FormEvent) => {
     if (e) e.preventDefault()
     if (!state.file || !state.fileHash) return
 
@@ -97,7 +97,7 @@ export default function MediaDetectPage() {
       const hashCode = state.fileHash
         .split("")
         .reduce((acc, char) => acc + char.charCodeAt(0), 0)
-      const seed = hashCode % 100 / 100
+      const seed = (hashCode % 100) / 100
       const isVideo = state.file.type.startsWith("video/")
       const confidence = Math.floor(seed * 20 + 70)
       let result: string
@@ -127,11 +127,11 @@ export default function MediaDetectPage() {
         error: "Error analyzing media. Please try again.",
       }))
     }
-  }
+  }, [state.file, state.fileHash])
 
   useEffect(() => {
     if (state.file && state.fileHash) handleSubmit()
-  }, [state.file, state.fileHash])
+  }, [state.file, state.fileHash, handleSubmit])
 
   const handleClear = () => {
     setState({
@@ -147,47 +147,6 @@ export default function MediaDetectPage() {
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "WebPage",
-            name: "NeuroScope Media Detection",
-            description:
-              "Advanced AI tool to detect whether audio or video content is AI-generated or human-made.",
-            url: "https://www.neuroscope.com/detect/media",
-            keywords: [
-              "AI detection",
-              "audio detection",
-              "video detection",
-              "AI-generated content",
-              "human-made content",
-              "NeuroScope",
-            ],
-            publisher: {
-              "@type": "Organization",
-              name: "NeuroScope",
-              logo: {
-                "@type": "ImageObject",
-                url: "https://www.neuroscope.com/logo.png",
-                width: 200,
-                height: 60,
-              },
-            },
-            mainEntity: {
-              "@type": state.file?.type.startsWith("video/") ? "VideoObject" : "AudioObject",
-              contentUrl: state.file
-                ? URL.createObjectURL(state.file)
-                : "https://www.neuroscope.com/placeholder.mp4",
-              description: "Uploaded media for AI vs. human detection",
-              uploadDate: new Date().toISOString(),
-              encodingFormat: state.file?.type || "audio/mpeg",
-            },
-          }),
-        }}
-      />
-
       <div className="max-w-4xl mx-auto space-y-8 min-h-[calc(100vh-8rem)] flex flex-col justify-center bg-gradient-to-b from-black to-gray-900 p-8">
         <h1 className="text-4xl font-extrabold text-center text-pink-400 animate-pulse tracking-tight">
           AI vs. Human Media Detector
@@ -244,13 +203,14 @@ export default function MediaDetectPage() {
             type="button"
             onClick={handleClear}
             className="w-full bg-red-600 hover:bg-red-700 text-white py-2 rounded-xl font-medium transition-all duration-300"
-            aria-label="Clear form"
           >
             Clear
           </button>
         </form>
 
-        {state.loading && <Loader message="Analyzing Media..." className="animate-spin text-pink-400" />}
+        {state.loading && (
+          <Loader message="Analyzing Media..." className="text-pink-400" />
+        )}
 
         {state.result && state.confidence !== null && (
           <ResultBox

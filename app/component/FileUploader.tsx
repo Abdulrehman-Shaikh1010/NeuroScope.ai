@@ -5,13 +5,26 @@ import { useDropzone } from "react-dropzone"
 
 interface FileUploaderProps {
   onDrop: (files: File[]) => void
-  accept: string // should be something like "image/*" or "image/png,image/jpeg"
+  accept: string
   label?: string
   className?: string
   onDragStateChange?: (dragging: boolean) => void
 }
 
-const cn = (...classes: (string | undefined | false)[]) => classes.filter(Boolean).join(" ")
+// Utility to handle conditional class names
+const cn = (...classes: Array<string | undefined | false | Record<string, boolean>>) => {
+  return classes
+    .flatMap((cls) =>
+      typeof cls === "string"
+        ? cls
+        : typeof cls === "object" && cls !== null
+        ? Object.entries(cls)
+            .filter(([, value]) => value)
+            .map(([key]) => key)
+        : []
+    )
+    .join(" ")
+}
 
 export const FileUploader: React.FC<FileUploaderProps> = ({
   onDrop,
@@ -36,12 +49,14 @@ export const FileUploader: React.FC<FileUploaderProps> = ({
     isDragReject,
   } = useDropzone({
     onDrop: handleDrop,
-    accept: accept, // Pass directly as string, e.g., "image/*"
+    accept: { [accept]: [] },
     onDragEnter: () => onDragStateChange?.(true),
     onDragLeave: () => onDragStateChange?.(false),
     onDropAccepted: () => onDragStateChange?.(false),
     onDropRejected: () => onDragStateChange?.(false),
   })
+
+  const inputProps = getInputProps()
 
   return (
     <div
@@ -55,11 +70,11 @@ export const FileUploader: React.FC<FileUploaderProps> = ({
       tabIndex={0}
       onKeyPress={(e) => {
         if (e.key === "Enter" || e.key === " ") {
-          ;(getInputProps() as any).onClick?.(e)
+          (inputProps as unknown as { onClick?: (event: React.KeyboardEvent) => void }).onClick?.(e)
         }
       }}
     >
-      <input {...getInputProps()} aria-hidden="true" title={`${label} input`} />
+      <input {...inputProps} aria-hidden="true" title={`${label} input`} />
       <div className="space-y-2">
         <h3 className="text-lg font-medium">{label}</h3>
         {isDragActive ? (

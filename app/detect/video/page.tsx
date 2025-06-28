@@ -30,35 +30,38 @@ export default function VideoDetectPage() {
     fileHash: null,
   })
 
+  // ✅ UseCallback wrapped for stability and ESLint fix
+  const saveDetectionToSupabase = useCallback(
+    async (file: File, result: string, confidence: number) => {
+      if (!user) return
+      try {
+        const { error } = await supabase.from("detections").insert({
+          user_id: user.id,
+          type: "video",
+          result,
+          confidence,
+          input_data: file.name,
+          file_name: file.name,
+          file_size: file.size,
+          file_type: file.type,
+          created_at: new Date().toISOString(),
+        })
+        if (error) console.error("Supabase error:", error.message)
+      } catch (err) {
+        console.error("Insert error:", (err as Error).message)
+      }
+    },
+    [user]
+  )
+
   useEffect(() => {
     return () => {
       if (state.file) URL.revokeObjectURL(URL.createObjectURL(state.file))
     }
   }, [state.file])
 
-  const generateFileHash = (file: File): string => {
-    return `${file.name}-${file.size}-${file.type}-${file.lastModified}`
-  }
-
-  const saveDetectionToSupabase = async (file: File, result: string, confidence: number) => {
-    if (!user) return
-    try {
-      const { error } = await supabase.from("detections").insert({
-        user_id: user.id,
-        type: "video",
-        result,
-        confidence,
-        input_data: file.name,
-        file_name: file.name,
-        file_size: file.size,
-        file_type: file.type,
-        created_at: new Date().toISOString(),
-      })
-      if (error) console.error("Supabase error:", error.message)
-    } catch (error) {
-      console.error("Supabase insert error:", (error as Error).message)
-    }
-  }
+  const generateFileHash = (file: File): string =>
+    `${file.name}-${file.size}-${file.type}-${file.lastModified}`
 
   const handleFileDrop = useCallback((files: File[]) => {
     const file = files[0]
@@ -103,48 +106,55 @@ export default function VideoDetectPage() {
     setState((prev) => ({ ...prev, isDragging }))
   }, [])
 
-  const handleSubmit = async (e?: React.FormEvent) => {
-    if (e) e.preventDefault()
-    if (!state.file || !state.fileHash) return
-
-    setState((prev) => ({
-      ...prev,
-      loading: true,
-      result: null,
-      confidence: null,
-      error: null,
-    }))
-
-    try {
-      await new Promise((resolve) => setTimeout(resolve, 1500))
-      const hashCode = state.fileHash.split("").reduce((acc, c) => acc + c.charCodeAt(0), 0)
-      const seed = (hashCode % 100) / 100
-      const confidence = Math.floor(seed * 20 + 70)
-      let result = seed > 0.5 ? "AI-Generated Video" : "Human-Made Video"
-      if (state.file.size < 10 * 1024 * 1024) result = seed > 0.3 ? "AI-Generated Video" : result
+  const handleSubmit = useCallback(
+    async (e?: React.FormEvent) => {
+      if (e) e.preventDefault()
+      if (!state.file || !state.fileHash) return
 
       setState((prev) => ({
         ...prev,
-        result,
-        confidence,
-        loading: false,
-      }))
-
-      await saveDetectionToSupabase(state.file, result, confidence)
-    } catch (error) {
-      setState((prev) => ({
-        ...prev,
+        loading: true,
         result: null,
         confidence: null,
-        loading: false,
-        error: "Error analyzing video. Please try again.",
+        error: null,
       }))
-    }
-  }
+
+      try {
+        await new Promise((resolve) => setTimeout(resolve, 1500))
+        const hashCode = state.fileHash
+          .split("")
+          .reduce((acc, c) => acc + c.charCodeAt(0), 0)
+        const seed = (hashCode % 100) / 100
+        const confidence = Math.floor(seed * 20 + 70)
+        let result = seed > 0.5 ? "AI-Generated Video" : "Human-Made Video"
+        if (state.file.size < 10 * 1024 * 1024) {
+          result = seed > 0.3 ? "AI-Generated Video" : result
+        }
+
+        setState((prev) => ({
+          ...prev,
+          result,
+          confidence,
+          loading: false,
+        }))
+
+        await saveDetectionToSupabase(state.file, result, confidence)
+      } catch {
+        setState((prev) => ({
+          ...prev,
+          result: null,
+          confidence: null,
+          loading: false,
+          error: "Error analyzing video. Please try again.",
+        }))
+      }
+    },
+    [state.file, state.fileHash, saveDetectionToSupabase]
+  )
 
   useEffect(() => {
     if (state.file && state.fileHash) handleSubmit()
-  }, [state.file, state.fileHash])
+  }, [state.file, state.fileHash, handleSubmit])
 
   return (
     <>
@@ -158,7 +168,7 @@ export default function VideoDetectPage() {
           AI vs. Human Video Detector
         </h1>
         <p className="text-center text-gray-300 text-lg">
-          Upload a video to detect if it’s AI-generated or human-made.
+          Upload a video to detect if it&rsquo;s AI-generated or human-made.
         </p>
 
         <form onSubmit={handleSubmit} className="space-y-6">
@@ -198,7 +208,6 @@ export default function VideoDetectPage() {
             {state.loading ? "Analyzing..." : "Detect Video"}
           </button>
 
-          {/* ✅ Clear Button */}
           <button
             type="button"
             onClick={() =>
