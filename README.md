@@ -1,37 +1,41 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+🧠 NeuroScope — AI Content Detector
+NeuroScope is an intelligent web app that accurately detects whether a text, audio, or video file is AI-generated or human-made. With a modern UI, instant detection, and Supabase-powered user authentication and history tracking, NeuroScope is your all-in-one tool for verifying digital content authenticity.
 
-## Getting Started
+🚀 Features
+✅ Text Detection – Paste or upload .txt files to find out if it’s written by a human or AI.
 
-First, run the development server:
+🎧 Audio Detection – Upload audio files to analyze if they’re synthetic or real human speech.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+🎥 Video Detection – Upload video files to verify AI-generated visuals vs real content.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+🔐 Authentication – Secure user login system powered by Supabase.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+🕓 History Tracking – Every user’s detection history is stored with timestamps for review.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+⚡ Fast & Intuitive – Clean UI, drag & drop uploads, and blazing-fast detection simulation.
 
-## Learn More
+🛠️ Tech Stack
+Next.js 14 – App Router + Client Components
 
-To learn more about Next.js, take a look at the following resources:
+TypeScript – Type-safe modern development
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Tailwind CSS – Beautiful UI with utility-first design
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Shadcn UI – Clean, customizable UI components
 
-## Deploy on Vercel
+Supabase – Auth, Database & Storage backend
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+AI Detection Logic – Simulated confidence scoring based on file features
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
-"# NeuroScope.ai" 
+💡 Use Case
+✅ Check if content is AI-generated before publishing
+
+✅ Detect deepfakes or synthetic voices
+
+✅ Build trust in content authenticity
+
+📷 Preview
+[Optional: Add screenshots or a link to a demo GIF here.]
+
+🧑‍💻 Author
+Built with ❤️ by Abdulrehman Shaikh (DevShaikhX)
