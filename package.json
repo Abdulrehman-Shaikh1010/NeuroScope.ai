@@ -49,5 +49,22 @@
     "tailwindcss": "^4.1.10",
     "tw-animate-css": "^1.3.4",
     "typescript": "^5"
-  }
+  },
+  "description": "🧠 NeuroScope — AI Content Detector NeuroScope is an intelligent web app that accurately detects whether a text, audio, or video file is AI-generated or human-made. With a modern UI, instant detection, and Supabase-powered user authentication and history tracking, NeuroScope is your all-in-one tool for verifying digital content authenticity.",
+  "main": "index.js",
+  "directories": {
+    "lib": "lib"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Abdulrehman-Shaikh1010/NeuroScope.ai.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/Abdulrehman-Shaikh1010/NeuroScope.ai/issues"
+  },
+  "homepage": "https://github.com/Abdulrehman-Shaikh1010/NeuroScope.ai#readme"
 }
