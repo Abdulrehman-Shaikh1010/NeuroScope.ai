@@ -67,7 +67,7 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "type": "commonjs",
+  "type": "module",
   "bugs": {
     "url": "https://github.com/Abdulrehman-Shaikh1010/NeuroScope.ai/issues"
   },
