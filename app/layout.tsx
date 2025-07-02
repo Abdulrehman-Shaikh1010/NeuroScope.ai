@@ -60,11 +60,6 @@ export const metadata: Metadata = {
       "max-snippet": -1,
     },
   },
-  viewport: "width=device-width, initial-scale=1",
-  themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
-    { media: "(prefers-color-scheme: dark)", color: "#0e0e10" },
-  ],
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

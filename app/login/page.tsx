@@ -1,6 +1,8 @@
+// ✅ Fixed Login Page with validation, metadata, and full functionality
 "use client"
 
 import { useState, useEffect, useCallback, FormEvent, ChangeEvent } from "react"
+import { useRouter } from "next/navigation"
 import { supabase } from "@/lib/supabaseClient"
 
 interface LoginState {
@@ -11,7 +13,9 @@ interface LoginState {
   isFormValid: boolean
 }
 
+
 export default function LoginPage() {
+  const router = useRouter()
   const [state, setState] = useState<LoginState>({
     email: "",
     password: "",
@@ -26,8 +30,7 @@ export default function LoginPage() {
   }, [state.email, state.password])
 
   useEffect(() => {
-    const isFormValid = validateForm()
-    setState((prev) => ({ ...prev, isFormValid }))
+    setState((prev) => ({ ...prev, isFormValid: validateForm() }))
   }, [validateForm])
 
   const handleLogin = async (e: FormEvent<HTMLFormElement>) => {
@@ -51,11 +54,9 @@ export default function LoginPage() {
 
       if (error) {
         setState((prev) => ({ ...prev, error: error.message, loading: false }))
-        return
+      } else {
+        router.push("/dashboard")
       }
-
-      // Optional: redirect user after login
-      // router.push("/dashboard") or window.location.href = "/dashboard"
     } catch (err: unknown) {
       const errorMessage = err instanceof Error ? err.message : "Unknown error"
       setState((prev) => ({
@@ -77,7 +78,6 @@ export default function LoginPage() {
 
   return (
     <>
-      {/* JSON-LD Structured SEO Data */}
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
@@ -85,8 +85,7 @@ export default function LoginPage() {
             "@context": "https://schema.org",
             "@type": "WebPage",
             name: "NeuroScope Login",
-            description:
-              "Secure login page for NeuroScope's AI content detection platform.",
+            description: "Secure login page for NeuroScope's AI content detection platform.",
             url: "https://www.neuroscope.com/login",
             publisher: {
               "@type": "Organization",
@@ -106,13 +105,9 @@ export default function LoginPage() {
         <form
           onSubmit={handleLogin}
           className="w-full max-w-md space-y-6 p-8 bg-gray-800/80 backdrop-blur-md rounded-2xl shadow-2xl border border-cyan-500/20 animate-fade-in"
-          aria-labelledby="login-heading"
           noValidate
         >
-          <h2
-            id="login-heading"
-            className="text-3xl font-extrabold text-center text-cyan-400 animate-pulse tracking-tight"
-          >
+          <h2 className="text-3xl font-extrabold text-center text-cyan-400 animate-pulse tracking-tight">
             Welcome to NeuroScope
           </h2>
           <p className="text-center text-gray-300 text-sm">
@@ -120,7 +115,6 @@ export default function LoginPage() {
           </p>
 
           <div className="space-y-4">
-            {/* Email Field */}
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-200">
                 Email
@@ -132,12 +126,10 @@ export default function LoginPage() {
                 value={state.email}
                 onChange={handleInputChange("email")}
                 required
-                autoComplete="email"
-                className="w-full mt-1 p-3 bg-gray-900 border-2 border-cyan-500/50 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-cyan-400 transition-all duration-300"
+                className="w-full mt-1 p-3 bg-gray-900 border-2 border-cyan-500/50 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-cyan-400"
               />
             </div>
 
-            {/* Password Field */}
             <div>
               <label htmlFor="password" className="block text-sm font-medium text-gray-200">
                 Password
@@ -149,27 +141,20 @@ export default function LoginPage() {
                 value={state.password}
                 onChange={handleInputChange("password")}
                 required
-                autoComplete="current-password"
-                className="w-full mt-1 p-3 bg-gray-900 border-2 border-cyan-500/50 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-cyan-400 transition-all duration-300"
+                className="w-full mt-1 p-3 bg-gray-900 border-2 border-cyan-500/50 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-cyan-400"
               />
             </div>
 
-            {/* Error Message */}
             {state.error && (
-              <p
-                className="text-red-400 text-sm text-center animate-fade-in"
-                role="alert"
-                aria-live="polite"
-              >
+              <p className="text-red-400 text-sm text-center" role="alert">
                 {state.error}
               </p>
             )}
 
-            {/* Submit Button */}
             <button
               type="submit"
               disabled={state.loading || !state.isFormValid}
-              className="w-full bg-cyan-500 hover:bg-cyan-600 text-white py-3 rounded-xl font-semibold transition-all duration-300 disabled:bg-gray-500 disabled:cursor-not-allowed shadow-lg hover:shadow-xl flex items-center justify-center space-x-2"
+              className="w-full bg-cyan-500 hover:bg-cyan-600 text-white py-3 rounded-xl font-semibold transition disabled:bg-gray-500 disabled:cursor-not-allowed shadow-lg hover:shadow-xl"
             >
               {state.loading ? (
                 <>
@@ -179,14 +164,7 @@ export default function LoginPage() {
                     fill="none"
                     viewBox="0 0 24 24"
                   >
-                    <circle
-                      className="opacity-25"
-                      cx="12"
-                      cy="12"
-                      r="10"
-                      stroke="currentColor"
-                      strokeWidth="4"
-                    />
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                     <path
                       className="opacity-75"
                       fill="currentColor"
@@ -201,16 +179,15 @@ export default function LoginPage() {
             </button>
           </div>
 
-          {/* Bottom Links */}
           <div className="text-center text-sm text-gray-400 space-y-2">
             <p>
-              Don’t have an account?{" "}
+              Don’t have an account?{' '}
               <a href="/signup" className="text-cyan-400 hover:text-cyan-300 underline">
                 Sign up
               </a>
             </p>
             <p>
-              Forgot password?{" "}
+              Forgot password?{' '}
               <a href="/reset-password" className="text-cyan-400 hover:text-cyan-300 underline">
                 Reset it
               </a>

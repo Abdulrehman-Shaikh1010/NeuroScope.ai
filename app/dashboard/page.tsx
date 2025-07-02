@@ -14,24 +14,28 @@ interface Detection {
   created_at: string
 }
 
+
 export default function DashboardPage() {
   const [user, setUser] = useState<User | null>(null)
   const [detections, setDetections] = useState<Detection[]>([])
   const [message, setMessage] = useState("")
+  const [loading, setLoading] = useState(true)
   const router = useRouter()
 
   useEffect(() => {
     const getUser = async () => {
       const { data, error } = await supabase.auth.getUser()
-      if (error || !data.user) {
+
+      if (error || !data?.user) {
         router.push('/login')
         return
       }
+
       setUser(data.user)
       fetchDetections(data.user.id)
     }
 
-    getUser()
+    getUser().finally(() => setLoading(false))
   }, [router])
 
   const fetchDetections = async (userId: string) => {
@@ -41,20 +45,32 @@ export default function DashboardPage() {
       .eq('user_id', userId)
       .order('created_at', { ascending: false })
 
-    if (!error && data) {
+    if (data && !error) {
       setDetections(data as Detection[])
     }
   }
 
   const sendMessage = async () => {
     if (!message.trim() || !user) return
-    const { error } = await supabase.from('messages').insert({ user_id: user.id, message })
-    if (!error) {
-      alert("Message sent!")
-      setMessage("")
+
+    const { error } = await supabase
+      .from('messages')
+      .insert({ user_id: user.id, message })
+
+    if (error) {
+      alert("❌ Failed to send message.")
     } else {
-      alert("Failed to send message.")
+      alert("✅ Message sent!")
+      setMessage("")
     }
+  }
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center text-white bg-black">
+        Loading Dashboard...
+      </div>
+    )
   }
 
   return (
@@ -88,7 +104,9 @@ export default function DashboardPage() {
               <p><strong>Content:</strong> {d.content?.slice(0, 60)}...</p>
               <p><strong>Result:</strong> {d.result}</p>
               <p><strong>Confidence:</strong> {d.confidence.toFixed(2)}%</p>
-              <p className="text-xs text-gray-400">{new Date(d.created_at).toLocaleString()}</p>
+              <p className="text-xs text-gray-400">
+                {new Date(d.created_at).toLocaleString()}
+              </p>
             </div>
           ))}
         </div>
