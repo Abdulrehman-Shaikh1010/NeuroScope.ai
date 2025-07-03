@@ -38,4 +38,4 @@ AI Detection Logic – Simulated confidence scoring based on file features
 [Optional: Add screenshots or a link to a demo GIF here.]
 
 🧑‍💻 Author
-Built with ❤️ by Abdulrehman Shaikh (DevShaikhX)
+Built with ❤️ by Abdulrehman Shaikh (DevShaikhX)"# NeuroScope.ai" 
