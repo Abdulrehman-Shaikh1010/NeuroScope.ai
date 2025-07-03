@@ -1,9 +1,9 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // other config options
   experimental: {
-    serverActions: true,
+    // remove serverActions unless you're using other experimental flags
   },
-  // other configs
 }
 
 export default nextConfig

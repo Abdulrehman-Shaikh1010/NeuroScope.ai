@@ -159,7 +159,7 @@ export default function MediaDetectPage() {
           <FileUploader
             onDrop={handleFileDrop}
             onDragStateChange={handleDragState}
-            accept="audio/*,video/*"
+            accept="audio/mpeg, audio/wav, video/mp4, video/webm"
             label={`Upload Audio or Video${state.file ? ` (${state.file.name})` : ""}`}
             className={`border-2 border-dashed transition-all duration-300 rounded-xl p-6 ${
               state.isDragging ? "border-pink-400 bg-pink-900/20" : "border-pink-600"
